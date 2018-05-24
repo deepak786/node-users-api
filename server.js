@@ -4,10 +4,13 @@ var express = require('express'),
 	mongoose = require('mongoose'),
   	User = require('./api/models/userModel'), //created model loading here
   	bodyParser = require('body-parser');
+
+// load env configuration
+require('dotenv').config();
   
 // mongoose instance connection url connection
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost/users"); 
+mongoose.connect("mongodb://"+process.env.host+"/"+process.env.db); 
 
 
 app.use(bodyParser.urlencoded({ extended: true }));

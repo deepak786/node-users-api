@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
-	User = mongoose.model('Users');
+	User = mongoose.model('Users'),
+	JWT = require('jsonwebtoken');
 
 var self = module.exports = {
 
@@ -40,6 +41,7 @@ var self = module.exports = {
 			console.log(user.password)
 			user.save(function(err, user){
 				if(err) return res.json({"status": 0, "message": err});
+				var token = JWT.sign({});
 				res.json({"status" : 1, "message": "User registered successfully", "data":user});
 			});
 		});
