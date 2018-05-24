@@ -41,8 +41,7 @@ var self = module.exports = {
 			console.log(user.password)
 			user.save(function(err, user){
 				if(err) return res.json({"status": 0, "message": err});
-				var token = JWT.sign({});
-				res.json({"status" : 1, "message": "User registered successfully", "data":user});
+				res.json({"status" : 1, "message": "User registered successfully", "data":{"token": self.getToken(user)}});
 			});
 		});
 	},
@@ -59,7 +58,7 @@ var self = module.exports = {
 			if(err) return res.json({"status": 0, "message": err});
 			if(user){
 				if(user.validPassword(req.body.password)){
-					return res.json({"status" : 1, "message": "Login successfully", "data":user});
+					return res.json({"status" : 1, "message": "Login successfully", "data":{"token": self.getToken(user)}});
 				}
 			}
 			res.json({"status": 0, "message": "Invalid details"});
@@ -81,6 +80,10 @@ var self = module.exports = {
 	list_all_users: function(req, res){
 
 	},
+
+	getToken: function(user){
+		return JWT.sign({email: user.email, _id: user._id}, process.env.JWT_SECRET);
+	}
 }
 
 
