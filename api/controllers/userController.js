@@ -78,11 +78,38 @@ var self = module.exports = {
 	},
 
 	list_all_users: function(req, res){
-
+		var user = req.user;
+		if(user && user._id){
+			console.log(user._id);
+			User.find({_id: {$ne: user._id}}, function(err, users){
+				if(err) return res.json({"status": 0, "message": err});
+				return res.json(users);
+			});
+		}else{
+			res.json({'status': 0, 'message': 'Invalid User'});
+		}
 	},
 
 	getToken: function(user){
 		return JWT.sign({email: user.email, _id: user._id}, process.env.JWT_SECRET);
+	},
+
+	check_header: function(req, res, next){
+		if(req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0]=='Bearer'){
+			// decode the token
+			var token = req.headers.authorization.split(' ')[1];
+			JWT.verify(token, process.env.JWT_SECRET, function(err, decode){
+				if(err){
+					// invalid authorization
+					return res.status(401).json({'status': 0, 'message': 'Invalid Authorization or token'});
+				}
+				req.user = decode;
+				next();
+			});
+		}else{
+			// missing authorization
+			res.status(401).json({'status': 0, 'message': 'Missing Authorization'});
+		}
 	}
 }
 
